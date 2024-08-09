@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send
-import eventlet
-
-eventlet.monkey_patch()  # Ensure compatibility with async operations
+import gevent
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app, async_mode='gevent')
 
 @app.route('/')
 def index():
