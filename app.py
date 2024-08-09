@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from flask_socketio import SocketIO, join_room, leave_room, send
-import gevent
+import eventlet
+import os
+
+eventlet.monkey_patch()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode='gevent')
+socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route('/')
 def index():
@@ -15,6 +18,10 @@ def chat():
     username = request.args.get('username')
     room = request.args.get('room')
     return render_template('chat.html', username=username, room=room)
+
+@app.route('/styles.css')
+def styles():
+    return send_from_directory('.', 'styles.css')
 
 @socketio.on('join')
 def on_join(data):
@@ -38,6 +45,5 @@ def handle_message(data):
     send(f'{username}: {msg}', to=room)
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port)
