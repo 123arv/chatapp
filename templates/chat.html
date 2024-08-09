@@ -24,14 +24,23 @@
         var username = "{{ username }}";
         var room = "{{ room }}";
 
-        // Join the room
+        // Emit 'join' event
         socket.emit('join', {'username': username, 'room': room});
 
         // Handle incoming messages
-        socket.on('message', function(msg){
+        socket.on('message', function(data) {
             var li = document.createElement("li");
-            li.className = "message received"; // Default to received messages
-            li.appendChild(document.createTextNode(msg));
+            if (data.type === 'system') {
+                li.className = "message system";
+                li.appendChild(document.createTextNode(data.msg));
+            } else if (data.type === 'message') {
+                if (data.username === username) {
+                    li.className = "message sent";
+                } else {
+                    li.className = "message received";
+                }
+                li.appendChild(document.createTextNode(data.username + ': ' + data.msg));
+            }
             document.getElementById("messages").appendChild(li);
         });
 
@@ -40,7 +49,7 @@
             if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 var li = document.createElement("li");
-                li.className = "message sent"; // Class for sent messages
+                li.className = "message sent";
                 li.appendChild(document.createTextNode(username + ': ' + input.value));
                 document.getElementById("messages").appendChild(li);
                 input.value = ''; // Clear the input field
