@@ -91,10 +91,16 @@
     </style>
 </head>
 <body>
-    <h2>Chat Room: {{ room }}</h2>
-    <ul id="messages"></ul>
-    <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-    <button onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+        <header class="chat-header">
+            <h2>Chat Room: {{ room }}</h2>
+        </header>
+        <ul id="messages"></ul>
+        <div class="message-input">
+            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script>
@@ -106,6 +112,13 @@
 
         socket.on('message', function(msg){
             var li = document.createElement("li");
+            li.className = "message";
+            // Check if the message is from the user or from others
+            if (msg.startsWith(username + ":")) {
+                li.classList.add("user");
+            } else {
+                li.classList.add("bot");
+            }
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
         });
