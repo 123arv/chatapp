@@ -14,7 +14,7 @@
         <ul id="messages" class="message-list"></ul>
         <div class="message-input">
             <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-            <button onclick="sendMessage()">Send</button>
+            <button id="sendMessageButton">Send</button>
         </div>
     </div>
 
@@ -44,9 +44,21 @@
             document.getElementById("messages").appendChild(li);
         });
 
+        // Send message when button is clicked
+        document.getElementById("sendMessageButton").addEventListener("click", function() {
+            sendMessage();
+        });
+
+        // Optionally, send message when Enter key is pressed
+        document.getElementById("myMessage").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
         function sendMessage() {
             var input = document.getElementById("myMessage");
-            if (input.value) {
+            if (input.value.trim() !== "") {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 var li = document.createElement("li");
                 li.className = "message sent";
