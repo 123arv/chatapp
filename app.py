@@ -27,7 +27,7 @@ def on_join(data):
     room = data['room']
     join_room(room)
     app.logger.debug(f'{username} has joined the room: {room}')
-    send(f'{username} has entered the room.', to=room)
+    send({'type': 'system', 'msg': f'{username} has entered the room.'}, to=room)
 
 @socketio.on('leave')
 def on_leave(data):
@@ -35,7 +35,7 @@ def on_leave(data):
     room = data['room']
     leave_room(room)
     app.logger.debug(f'{username} has left the room: {room}')
-    send(f'{username} has left the room.', to=room)
+    send({'type': 'system', 'msg': f'{username} has left the room.'}, to=room)
 
 @socketio.on('message')
 def handle_message(data):
@@ -43,7 +43,7 @@ def handle_message(data):
     msg = data['msg']
     username = data['username']
     app.logger.debug(f"Received message from {username} in room {room}: {msg}")
-    send(f'{username}: {msg}', to=room)
+    send({'type': 'message', 'msg': msg, 'username': username}, to=room)
 
 if __name__ == '__main__':
     import os
