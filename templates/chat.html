@@ -24,8 +24,10 @@
         var username = "{{ username }}";
         var room = "{{ room }}";
 
+        // Join the room
         socket.emit('join', {'username': username, 'room': room});
 
+        // Handle incoming messages
         socket.on('message', function(msg){
             var li = document.createElement("li");
             li.className = "message received"; // Default to received messages
@@ -41,10 +43,11 @@
                 li.className = "message sent"; // Class for sent messages
                 li.appendChild(document.createTextNode(username + ': ' + input.value));
                 document.getElementById("messages").appendChild(li);
-                input.value = '';
+                input.value = ''; // Clear the input field
             }
         }
 
+        // Handle window close
         window.onbeforeunload = function() {
             socket.emit('leave', {'username': username, 'room': room});
         }
