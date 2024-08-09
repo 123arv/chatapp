@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="chat-container">
@@ -28,7 +28,7 @@
 
         socket.on('message', function(msg){
             var li = document.createElement("li");
-            li.className = "message";
+            li.className = "message received"; // Default to received messages
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
         });
@@ -37,6 +37,10 @@
             var input = document.getElementById("myMessage");
             if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
+                var li = document.createElement("li");
+                li.className = "message sent"; // Class for sent messages
+                li.appendChild(document.createTextNode(username + ': ' + input.value));
+                document.getElementById("messages").appendChild(li);
                 input.value = '';
             }
         }
