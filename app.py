@@ -1,11 +1,6 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send
 import gevent
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -26,16 +21,21 @@ def on_join(data):
     username = data['username']
     room = data['room']
     join_room(room)
-    app.logger.debug(f'{username} has joined the room: {room}')
-    send({'type': 'system', 'msg': f'{username} has entered the room.'}, to=room)
+    send(f'{username} has entered the room.', to=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    send(f'{username} has left the room.', to=room)
 
 @socketio.on('message')
 def handle_message(data):
     room = data['room']
     msg = data['msg']
     username = data['username']
-    app.logger.debug(f"Received message from {username} in room {room}: {msg}")
-    send({'type': 'message', 'msg': msg, 'username': username}, to=room)
+    send(f'{username}: {msg}', to=room)
 
 if __name__ == '__main__':
     import os
