@@ -101,19 +101,24 @@
         var username = "{{ username }}";
         var room = "{{ room }}";
 
+        // Emit 'join' event
         socket.emit('join', {'username': username, 'room': room});
 
+        // Handle incoming messages
         socket.on('message', function(data){
             var li = document.createElement("li");
-            if (data.username === username) {
-                li.className = "sent";
-            } else {
-                li.className = "received";
+            if (data.type === 'message') {
+                li.className = data.username === username ? 'sent' : 'received';
+                li.appendChild(document.createTextNode(data.username + ': ' + data.msg));
+                document.getElementById("messages").appendChild(li);
+            } else if (data.type === 'system') {
+                li.className = 'received';  // or 'system' depending on your design
+                li.appendChild(document.createTextNode(data.msg));
+                document.getElementById("messages").appendChild(li);
             }
-            li.appendChild(document.createTextNode(data.username + ': ' + data.msg));
-            document.getElementById("messages").appendChild(li);
         });
 
+        // Send message function
         function sendMessage() {
             var input = document.getElementById("myMessage");
             if (input.value.trim() !== "") {
@@ -122,6 +127,7 @@
             }
         }
 
+        // Handle window close
         window.onbeforeunload = function() {
             socket.emit('leave', {'username': username, 'room': room});
         }
