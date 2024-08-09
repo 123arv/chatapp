@@ -4,96 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e5ddd5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        h2 {
-            background-color: #25D366;
-            color: white;
-            padding: 10px;
-            margin: 0;
-            text-align: center;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-        }
-
-        #messages {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        #messages li {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 60%;
-            word-wrap: break-word;
-        }
-
-        .sent {
-            background-color: #dcf8c6;
-            margin-left: auto;
-        }
-
-        .received {
-            background-color: #ffffff;
-            margin-right: auto;
-        }
-
-        .message-input {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            background-color: #ffffff;
-        }
-
-        #myMessage {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            margin-right: 10px;
-        }
-
-        button {
-            background-color: #25D366;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #1ebe56;
-        }
-    </style>
 </head>
 <body>
     <h2>Chat Room: {{ room }}</h2>
-    <div class="chat-container">
-        <ul id="messages"></ul>
-        <div class="message-input">
-            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+    <ul id="messages"></ul>
+    <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send</button>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script>
@@ -101,33 +17,22 @@
         var username = "{{ username }}";
         var room = "{{ room }}";
 
-        // Emit 'join' event
         socket.emit('join', {'username': username, 'room': room});
 
-        // Handle incoming messages
-        socket.on('message', function(data){
+        socket.on('message', function(msg){
             var li = document.createElement("li");
-            if (data.type === 'message') {
-                li.className = data.username === username ? 'sent' : 'received';
-                li.appendChild(document.createTextNode(data.username + ': ' + data.msg));
-                document.getElementById("messages").appendChild(li);
-            } else if (data.type === 'system') {
-                li.className = 'received';  // or 'system' depending on your design
-                li.appendChild(document.createTextNode(data.msg));
-                document.getElementById("messages").appendChild(li);
-            }
+            li.appendChild(document.createTextNode(msg));
+            document.getElementById("messages").appendChild(li);
         });
 
-        // Send message function
         function sendMessage() {
             var input = document.getElementById("myMessage");
-            if (input.value.trim() !== "") {
+            if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 input.value = '';
             }
         }
 
-        // Handle window close
         window.onbeforeunload = function() {
             socket.emit('leave', {'username': username, 'room': room});
         }
