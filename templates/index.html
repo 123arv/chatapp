@@ -4,28 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to the Chat App</h1>
-        <div class="login-form">
-            <input id="username" placeholder="Enter your name">
-            <input id="room" placeholder="Enter room name">
-            <button onclick="openChat()">Start Chat</button>
-        </div>
-    </div>
     <script>
         function openChat() {
             const username = document.getElementById('username').value;
             const room = document.getElementById('room').value;
             if (username && room) {
                 const url = `chat?username=${username}&room=${room}`;
-                window.open(url, '_blank', 'width=400,height=600');
+                window.open(url, '_blank', 'width=400,height=400');
             } else {
                 alert('Please enter both username and room.');
             }
         }
     </script>
+</head>
+<body>
+    <h1>Welcome to the Chat App</h1>
+    <input id="username" placeholder="Enter your name">
+    <input id="room" placeholder="Enter room name">
+    <button onclick="openChat()">Start Chat</button>
 </body>
 </html>
