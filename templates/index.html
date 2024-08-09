@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script>
+        function openChat() {
+            const username = document.getElementById('username').value;
+            const room = document.getElementById('room').value;
+            const url = `chat?username=${username}&room=${room}`;
+            window.open(url, '_blank', 'width=400,height=400');
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Chat App</h1>
+    <input id="username" placeholder="Enter your name">
+    <input id="room" placeholder="Enter room name">
+    <button onclick="openChat()">Start Chat</button>
+</body>
+</html>
