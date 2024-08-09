@@ -29,14 +29,6 @@ def on_join(data):
     app.logger.debug(f'{username} has joined the room: {room}')
     send({'type': 'system', 'msg': f'{username} has entered the room.'}, to=room)
 
-@socketio.on('leave')
-def on_leave(data):
-    username = data['username']
-    room = data['room']
-    leave_room(room)
-    app.logger.debug(f'{username} has left the room: {room}')
-    send({'type': 'system', 'msg': f'{username} has left the room.'}, to=room)
-
 @socketio.on('message')
 def handle_message(data):
     room = data['room']
