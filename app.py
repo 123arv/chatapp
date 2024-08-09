@@ -35,7 +35,9 @@ def handle_message(data):
     room = data['room']
     msg = data['msg']
     username = data['username']
+    print(f"Received message: {username}: {msg}")  # Debug line
     send(f'{username}: {msg}', to=room)
+
 
 if __name__ == '__main__':
     import os
