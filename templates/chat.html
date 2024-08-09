@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Chat Room: {{ room }}</h2>
-    <ul id="messages"></ul>
-    <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-    <button onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+        <header class="chat-header">
+            <h2>Chat Room: {{ room }}</h2>
+        </header>
+        <ul id="messages" class="message-list"></ul>
+        <div class="message-input">
+            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script>
@@ -21,6 +28,7 @@
 
         socket.on('message', function(msg){
             var li = document.createElement("li");
+            li.className = "message";
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
         });
