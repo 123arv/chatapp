@@ -4,19 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
-    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="chat-container">
-        <header class="chat-header">
-            <h2>Chat Room: {{ room }}</h2>
-        </header>
-        <ul id="messages" class="message-list"></ul>
-        <div class="message-input">
-            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-            <button id="sendMessageButton">Send</button>
-        </div>
-    </div>
+    <h2>Chat Room: {{ room }}</h2>
+    <ul id="messages"></ul>
+    <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send</button>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script>
@@ -24,51 +17,22 @@
         var username = "{{ username }}";
         var room = "{{ room }}";
 
-        // Emit 'join' event
         socket.emit('join', {'username': username, 'room': room});
 
-        // Handle incoming messages
-        socket.on('message', function(data) {
+        socket.on('message', function(msg){
             var li = document.createElement("li");
-            if (data.type === 'system') {
-                li.className = "message system";
-                li.appendChild(document.createTextNode(data.msg));
-            } else if (data.type === 'message') {
-                if (data.username === username) {
-                    li.className = "message sent";
-                } else {
-                    li.className = "message received";
-                }
-                li.appendChild(document.createTextNode(data.username + ': ' + data.msg));
-            }
+            li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
-        });
-
-        // Send message when button is clicked
-        document.getElementById("sendMessageButton").addEventListener("click", function() {
-            sendMessage();
-        });
-
-        // Optionally, send message when Enter key is pressed
-        document.getElementById("myMessage").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
         });
 
         function sendMessage() {
             var input = document.getElementById("myMessage");
-            if (input.value.trim() !== "") {
+            if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
-                var li = document.createElement("li");
-                li.className = "message sent";
-                li.appendChild(document.createTextNode(username + ': ' + input.value));
-                document.getElementById("messages").appendChild(li);
-                input.value = ''; // Clear the input field
+                input.value = '';
             }
         }
 
-        // Handle window close
         window.onbeforeunload = function() {
             socket.emit('leave', {'username': username, 'room': room});
         }
