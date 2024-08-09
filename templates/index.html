@@ -8,8 +8,12 @@
         function openChat() {
             const username = document.getElementById('username').value;
             const room = document.getElementById('room').value;
-            const url = `chat?username=${username}&room=${room}`;
-            window.open(url, '_blank', 'width=400,height=400');
+            if (username && room) {
+                const url = `chat?username=${username}&room=${room}`;
+                window.open(url, '_blank', 'width=400,height=400');
+            } else {
+                alert('Please enter both username and room.');
+            }
         }
     </script>
 </head>
