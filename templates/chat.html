@@ -8,7 +8,7 @@
 <body>
     <h2>Chat Room: {{ room }}</h2>
     <ul id="messages"></ul>
-    <input id="myMessage" autocomplete="off">
+    <input id="myMessage" autocomplete="off" placeholder="Type your message here">
     <button onclick="sendMessage()">Send</button>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
@@ -27,8 +27,10 @@
 
         function sendMessage() {
             var input = document.getElementById("myMessage");
-            socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
-            input.value = '';
+            if (input.value) {
+                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
+                input.value = '';
+            }
         }
 
         window.onbeforeunload = function() {
