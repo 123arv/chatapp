@@ -3,24 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
-    <script>
-        function openChat() {
-            const username = document.getElementById('username').value;
-            const room = document.getElementById('room').value;
-            if (username && room) {
-                const url = `chat?username=${username}&room=${room}`;
-                window.open(url, '_blank', 'width=400,height=400');
-            } else {
-                alert('Please enter both username and room.');
+    <title>Welcome to Chat App</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-header {
+            margin-bottom: 20px;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            font-size: 16px;
+            color: #666;
+            margin: 5px 0 0;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .login-form input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .login-form button {
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-form button:hover {
+            background-color: #0056a0;
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-footer a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            .login-header h1 {
+                font-size: 20px;
+            }
+
+            .login-form input, .login-form button {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .login-footer {
+                font-size: 12px;
             }
         }
-    </script>
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Chat App</h1>
-    <input id="username" placeholder="Enter your name">
-    <input id="room" placeholder="Enter room name">
-    <button onclick="openChat()">Start Chat</button>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Welcome to the Chat App</h1>
+            <p>Please login to continue</p>
+        </div>
+        <form class="login-form" action="/chat" method="POST">
+            <input type="text" name="username" placeholder="Enter your username" required>
+            <input type="text" name="room" placeholder="Enter room name" required>
+            <button type="submit">Join Chat</button>
+        </form>
+        <div class="login-footer">
+            <p>Not a member? <a href="#">Sign up now</a></p>
+        </div>
+    </div>
 </body>
 </html>
