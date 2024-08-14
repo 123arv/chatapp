@@ -2,140 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Welcome to Chat Room</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 90vh; /* Reduced size */
-            max-width: 90vw; /* Reduced size */
-            margin: 5vh auto; /* Centered on the screen */
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background-color: #0078d4;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px 8px 0 0;
-            box-sizing: border-box;
-            font-size: 18px;
-        }
-
-        #messages {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex: 1;
-            box-sizing: border-box;
-        }
-
-        .message {
-            padding: 8px;
-            border-bottom: 1px solid #e0e0e0;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .message:nth-child(odd) {
-            background-color: #f9f9f9;
-        }
-
-        .message.user {
-            background-color: #e0f7fa;
-            text-align: right;
-            border-radius: 8px 8px 0 8px;
-            margin: 4px 10px;
-        }
-
-        .message.bot {
-            background-color: #ffffff;
-            text-align: left;
-            border-radius: 8px 8px 8px 0;
-            margin: 4px 10px;
-        }
-
-        .message-input {
-            display: flex;
-            padding: 10px;
-            background-color: #f5f5f5;
-            border-radius: 0 0 8px 8px;
-            box-sizing: border-box;
-        }
-
-        .message-input input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 8px;
-            outline: none;
-            font-size: 14px;
-            -webkit-text-size-adjust: 100%; /* Prevent zooming on iOS */
-        }
-
-        .message-input button {
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .message-input button:hover {
-            background-color: #0056a0;
-        }
-
-        /* Responsive Design for Small Screens */
-        @media (max-width: 480px) {
-            .chat-header {
-                font-size: 16px;
-                padding: 8px;
-            }
-
-            .message-input input {
-                font-size: 12px;
-                padding: 6px;
-            }
-
-            .message-input button {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-
-            .message {
-                font-size: 12px;
-                padding: 6px;
-            }
-        }
+        /* Add your CSS styles here */
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <header class="chat-header">
-            <h2>Chat Room: {{ room }}</h2>
-        </header>
+        <h2>Chat Room: {{ room }}</h2>
         <ul id="messages"></ul>
-        <div class="message-input">
-            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+        <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+        <button onclick="sendMessage()">Send</button>
     </div>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
@@ -148,12 +26,6 @@
 
         socket.on('message', function(msg){
             var li = document.createElement("li");
-            li.className = "message";
-            if (msg.startsWith(username + ":")) {
-                li.classList.add("user");
-            } else {
-                li.classList.add("bot");
-            }
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
         });
