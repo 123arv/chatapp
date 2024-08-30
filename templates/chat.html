@@ -19,7 +19,7 @@
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 85vh; /* Full viewport height */
+            height: 100vh; /* Full viewport height */
             width: 90vw;  /* Reduced width */
             max-width: 360px; /* Further reduced max width */
             margin: 0 auto; /* Centered on the screen */
@@ -107,9 +107,10 @@
             bottom: 0;
             width: 100%;
             background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+            gap: 8px; /* Add space between elements */
         }
 
-        .message-input input {
+        .message-input input[type="text"] {
             flex: 1;
             padding: 6px; /* Reduced padding */
             border: 1px solid #ddd;
@@ -118,6 +119,23 @@
             outline: none;
             font-size: 12px; /* Reduced font size */
             -webkit-text-size-adjust: 100%; /* Prevent zooming on iOS */
+        }
+
+        .message-input input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
+
+        .message-input label {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 6px 12px; /* Reduced padding */
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px; /* Reduced font size */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .message-input button {
@@ -141,7 +159,7 @@
                 padding: 6px; /* Further reduced padding */
             }
 
-            .message-input input {
+            .message-input input[type="text"] {
                 font-size: 10px; /* Further reduced font size */
                 padding: 6px; /* Further reduced padding */
             }
@@ -166,7 +184,9 @@
         </header>
         <ul id="messages"></ul>
         <div class="message-input">
-            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+            <input id="fileInput" type="file" multiple>
+            <label for="fileInput">📁</label>
+            <input id="myMessage" type="text" autocomplete="off" placeholder="Type your message here">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
@@ -194,7 +214,17 @@
                 li.classList.add("bot"); // Default bot style
             }
 
-            li.appendChild(document.createTextNode(msg));
+            // Display the message or file
+            var content = document.createElement("div");
+            content.textContent = msg.text || msg;
+            if (msg.file) {
+                var img = document.createElement("img");
+                img.src = msg.file;
+                img.style.maxWidth = "100%";
+                img.style.borderRadius = "8px";
+                content.appendChild(img);
+            }
+            li.appendChild(content);
             var messages = document.getElementById("messages");
             messages.appendChild(li);
             messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom to show latest message
@@ -202,9 +232,31 @@
 
         function sendMessage() {
             var input = document.getElementById("myMessage");
-            if (input.value) {
-                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
-                input.value = '';
+            var fileInput = document.getElementById("fileInput");
+
+            if (input.value || fileInput.files.length) {
+                var formData = new FormData();
+                formData.append('msg', input.value);
+                formData.append('room', room);
+                formData.append('username', username);
+
+                for (var i = 0; i < fileInput.files.length; i++) {
+                    formData.append('file' + i, fileInput.files[i]);
+                }
+
+                fetch('/upload', { // Adjust this URL to your server's file upload endpoint
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        socket.emit('message', {text: input.value, file: data.fileUrl, room: room, username: username});
+                        input.value = '';
+                        fileInput.value = ''; // Reset file input
+                    }
+                })
+                .catch(error => console.error('Error uploading file:', error));
             }
         }
 
