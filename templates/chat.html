@@ -51,7 +51,7 @@
             box-sizing: border-box;
             padding: 8px; /* Reduced padding */
             display: flex;
-            flex-direction: column-reverse; /* Keeps latest messages at the bottom */
+            flex-direction: column; /* Messages should flow from top to bottom */
         }
 
         .message {
@@ -194,8 +194,9 @@
             }
 
             li.appendChild(document.createTextNode(msg));
-            document.getElementById("messages").appendChild(li);
-            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight; // Auto-scroll to latest message
+            var messages = document.getElementById("messages");
+            messages.appendChild(li);
+            messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom to show latest message
         });
 
         function sendMessage() {
