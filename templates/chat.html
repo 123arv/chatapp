@@ -13,20 +13,20 @@
             background: linear-gradient(135deg, #f0f4f8, #e6e9ef); /* Light mixed color gradient */
             background-size: cover;
             height: 100vh;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden; /* Prevent scrolling on body */
         }
 
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 80vh; /* Reduced height */
-            width: 80vw;  /* Reduced width */
+            height: 85vh; /* Full viewport height */
+            width: 90vw;  /* Reduced width */
             max-width: 360px; /* Further reduced max width */
             margin: 0 auto; /* Centered on the screen */
             background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: relative; /* Position relative for absolute children */
+            position: relative; /* For positioning children absolutely */
         }
 
         .chat-header {
@@ -46,7 +46,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            overflow-y: auto;
+            overflow-y: auto; /* Allow scrolling */
             flex: 1;
             box-sizing: border-box;
             padding: 8px; /* Reduced padding */
@@ -106,6 +106,7 @@
             position: absolute; /* Fixed position at bottom */
             bottom: 0;
             width: 100%;
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
         }
 
         .message-input input {
