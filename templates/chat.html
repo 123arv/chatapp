@@ -32,11 +32,11 @@
         .chat-header {
             background-color: #0078d4;
             color: white;
-            padding: 12px;
+            padding: 8px; /* Reduced padding */
             text-align: center;
             border-radius: 8px 8px 0 0;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 14px; /* Reduced font size */
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -49,15 +49,17 @@
             overflow-y: auto;
             flex: 1;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 8px; /* Reduced padding */
+            display: flex;
+            flex-direction: column-reverse; /* Keeps latest messages at the bottom */
         }
 
         .message {
-            padding: 8px;
-            margin-bottom: 8px; /* Space between messages */
-            border-radius: 12px;
+            padding: 6px; /* Reduced padding */
+            margin-bottom: 6px; /* Reduced space between messages */
+            border-radius: 8px; /* Reduced border-radius */
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 12px; /* Reduced font size */
             max-width: 100%;
             word-break: break-word;
             display: block;
@@ -96,21 +98,24 @@
 
         .message-input {
             display: flex;
-            padding: 12px;
+            padding: 8px; /* Reduced padding */
             background-color: #f5f5f5;
             border-radius: 0 0 8px 8px;
             box-sizing: border-box;
             align-items: center;
+            position: absolute; /* Fixed position at bottom */
+            bottom: 0;
+            width: 100%;
         }
 
         .message-input input {
             flex: 1;
-            padding: 10px;
+            padding: 8px; /* Reduced padding */
             border: 1px solid #ddd;
             border-radius: 4px;
-            margin-right: 8px;
+            margin-right: 4px; /* Reduced margin-right */
             outline: none;
-            font-size: 14px;
+            font-size: 12px; /* Reduced font size */
             -webkit-text-size-adjust: 100%; /* Prevent zooming on iOS */
         }
 
@@ -118,10 +123,10 @@
             background-color: #0078d4;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px; /* Reduced padding */
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px; /* Reduced font size */
         }
 
         .message-input button:hover {
@@ -131,24 +136,24 @@
         /* Responsive Design for Small Screens */
         @media (max-width: 480px) {
             .chat-header {
-                font-size: 14px;
-                padding: 8px;
+                font-size: 12px; /* Further reduced font size */
+                padding: 6px; /* Further reduced padding */
             }
 
             .message-input input {
-                font-size: 12px;
-                padding: 8px;
+                font-size: 10px; /* Further reduced font size */
+                padding: 6px; /* Further reduced padding */
             }
 
             .message-input button {
-                font-size: 12px;
-                padding: 6px 12px;
+                font-size: 10px; /* Further reduced font size */
+                padding: 4px 8px; /* Further reduced padding */
             }
 
             .message {
-                font-size: 12px;
-                padding: 6px;
-                margin-bottom: 6px; /* Reduced space between messages */
+                font-size: 10px; /* Further reduced font size */
+                padding: 4px; /* Further reduced padding */
+                margin-bottom: 4px; /* Further reduced space between messages */
             }
         }
     </style>
@@ -190,6 +195,7 @@
 
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
+            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight; // Auto-scroll to latest message
         });
 
         function sendMessage() {
