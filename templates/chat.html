@@ -49,17 +49,18 @@
             overflow-y: auto;
             flex: 1;
             box-sizing: border-box;
+            padding: 10px;
         }
 
         .message {
-            padding: 10px;
-            margin: 5px;
+            padding: 8px;
+            margin-bottom: 8px; /* Space between messages */
             border-radius: 12px;
             box-sizing: border-box;
             font-size: 14px;
-            max-width: 80%;
+            max-width: 100%;
             word-break: break-word;
-            display: inline-block;
+            display: block;
             clear: both;
         }
 
@@ -104,7 +105,7 @@
 
         .message-input input {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-right: 8px;
@@ -117,7 +118,7 @@
             background-color: #0078d4;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
@@ -141,12 +142,13 @@
 
             .message-input button {
                 font-size: 12px;
-                padding: 8px 14px;
+                padding: 6px 12px;
             }
 
             .message {
                 font-size: 12px;
-                padding: 8px;
+                padding: 6px;
+                margin-bottom: 6px; /* Reduced space between messages */
             }
         }
     </style>
