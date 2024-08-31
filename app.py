@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send
-import base64
 import gevent
 
 app = Flask(__name__)
@@ -22,33 +21,21 @@ def on_join(data):
     username = data['username']
     room = data['room']
     join_room(room)
-    send({
-        'msg': f'{username} has entered the room.',
-        'username': 'system',
-        'isSystemMessage': True
-    }, to=room)
+    send(f'{username} has entered the room.', to=room)
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['username']
     room = data['room']
     leave_room(room)
-    send({
-        'msg': f'{username} has left the room.',
-        'username': 'system',
-        'isSystemMessage': True
-    }, to=room)
+    send(f'{username} has left the room.', to=room)
 
 @socketio.on('message')
 def handle_message(data):
     room = data['room']
     msg = data['msg']
     username = data['username']
-    send({
-        'msg': msg,
-        'username': username,
-        'isSystemMessage': False
-    }, to=room)
+    send(f'{username}: {msg}', to=room)
 
 if __name__ == '__main__':
     import os
