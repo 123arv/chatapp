@@ -197,27 +197,23 @@
 
         socket.emit('join', {'username': username, 'room': room});
 
-        socket.on('message', function(data){
+        socket.on('message', function(data) {
             var li = document.createElement("li");
             li.className = "message";
+            
+            if (data.username === username) {
+                li.classList.add("user1");
+            } else {
+                li.classList.add("user2"); // Default other user style
+            }
 
-            if (data.type === 'text') {
-                if (data.msg.startsWith(username + ":")) {
-                    li.classList.add("user1");
-                } else if (data.msg.startsWith("User2:")) {
-                    li.classList.add("user2");
-                } else if (data.msg.startsWith("User3:")) {
-                    li.classList.add("user3");
-                } else {
-                    li.classList.add("bot");
-                }
-                li.appendChild(document.createTextNode(data.msg));
-            } else if (data.type === 'image') {
-                li.classList.add("user1"); // Adjust this based on your logic
+            if (data.msg.startsWith('<img src="')) {
                 var img = new Image();
                 img.src = data.msg;
                 img.classList.add('image-preview');
                 li.appendChild(img);
+            } else {
+                li.appendChild(document.createTextNode(data.msg));
             }
 
             document.getElementById("messages").appendChild(li);
@@ -227,7 +223,7 @@
         function sendMessage() {
             var input = document.getElementById("myMessage");
             if (input.value) {
-                socket.emit('message', {'msg': input.value, 'room': room, 'username': username, 'type': 'text'});
+                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 input.value = '';
                 scrollToBottom(); // Scroll after sending a message
             }
@@ -254,23 +250,25 @@
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    var imgData = e.target.result;
-                    
-                    var li = document.createElement("li");
-                    li.className = "message user1";
-                    var img = new Image();
-                    img.src = imgData;
-                    img.classList.add('image-preview');
-                    li.appendChild(img);
-                    document.getElementById("messages").appendChild(li);
+                    var imgSrc = e.target.result;
                     
                     // Emit the image as base64 string to the server
                     socket.emit('message', {
-                        'msg': imgData,
+                        'msg': imgSrc,
                         'room': room,
-                        'username': username,
-                        'type': 'image'
+                        'username': username
                     });
+
+                    // Create an image preview locally for immediate feedback
+                    var img = new Image();
+                    img.src = imgSrc;
+                    img.classList.add('image-preview');
+                    
+                    var li = document.createElement("li");
+                    li.className = "message user1";
+                    li.appendChild(img);
+                    document.getElementById("messages").appendChild(li);
+                    
                     scrollToBottom(); // Scroll after sending an image
                 }
                 reader.readAsDataURL(file);
