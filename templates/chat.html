@@ -197,25 +197,22 @@
 
         socket.emit('join', {'username': username, 'room': room});
 
-        socket.on('message', function(data) {
+        socket.on('message', function(msg){
             var li = document.createElement("li");
             li.className = "message";
-            
-            if (data.username === username) {
-                li.classList.add("user1");
+
+            // Example logic for user color coding (you can replace this with your own logic)
+            if (msg.startsWith(username + ":")) {
+                li.classList.add("user1"); // User 1
+            } else if (msg.startsWith("User2:")) {
+                li.classList.add("user2"); // User 2
+            } else if (msg.startsWith("User3:")) {
+                li.classList.add("user3"); // User 3
             } else {
-                li.classList.add("user2"); // Default other user style
+                li.classList.add("bot"); // Default bot style
             }
 
-            if (data.msg.startsWith('<img src="')) {
-                var img = new Image();
-                img.src = data.msg;
-                img.classList.add('image-preview');
-                li.appendChild(img);
-            } else {
-                li.appendChild(document.createTextNode(data.msg));
-            }
-
+            li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
             scrollToBottom(); // Automatically scroll to the bottom
         });
@@ -250,18 +247,8 @@
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    var imgSrc = e.target.result;
-                    
-                    // Emit the image as base64 string to the server
-                    socket.emit('message', {
-                        'msg': imgSrc,
-                        'room': room,
-                        'username': username
-                    });
-
-                    // Create an image preview locally for immediate feedback
                     var img = new Image();
-                    img.src = imgSrc;
+                    img.src = e.target.result;
                     img.classList.add('image-preview');
                     
                     var li = document.createElement("li");
@@ -269,6 +256,12 @@
                     li.appendChild(img);
                     document.getElementById("messages").appendChild(li);
                     
+                    // Emit the image as base64 string to the server
+                    socket.emit('message', {
+                        'msg': '<img src="' + e.target.result + '" class="image-preview">',
+                        'room': room,
+                        'username': username
+                    });
                     scrollToBottom(); // Scroll after sending an image
                 }
                 reader.readAsDataURL(file);
