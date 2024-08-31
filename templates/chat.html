@@ -197,22 +197,29 @@
 
         socket.emit('join', {'username': username, 'room': room});
 
-        socket.on('message', function(msg){
+        socket.on('message', function(data){
             var li = document.createElement("li");
             li.className = "message";
 
-            // Example logic for user color coding (you can replace this with your own logic)
-            if (msg.startsWith(username + ":")) {
-                li.classList.add("user1"); // User 1
-            } else if (msg.startsWith("User2:")) {
-                li.classList.add("user2"); // User 2
-            } else if (msg.startsWith("User3:")) {
-                li.classList.add("user3"); // User 3
-            } else {
-                li.classList.add("bot"); // Default bot style
+            if (data.type === 'text') {
+                if (data.msg.startsWith(username + ":")) {
+                    li.classList.add("user1");
+                } else if (data.msg.startsWith("User2:")) {
+                    li.classList.add("user2");
+                } else if (data.msg.startsWith("User3:")) {
+                    li.classList.add("user3");
+                } else {
+                    li.classList.add("bot");
+                }
+                li.appendChild(document.createTextNode(data.msg));
+            } else if (data.type === 'image') {
+                li.classList.add("user1"); // Adjust this based on your logic
+                var img = new Image();
+                img.src = data.msg;
+                img.classList.add('image-preview');
+                li.appendChild(img);
             }
 
-            li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
             scrollToBottom(); // Automatically scroll to the bottom
         });
@@ -220,7 +227,7 @@
         function sendMessage() {
             var input = document.getElementById("myMessage");
             if (input.value) {
-                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
+                socket.emit('message', {'msg': input.value, 'room': room, 'username': username, 'type': 'text'});
                 input.value = '';
                 scrollToBottom(); // Scroll after sending a message
             }
@@ -247,20 +254,22 @@
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    var img = new Image();
-                    img.src = e.target.result;
-                    img.classList.add('image-preview');
+                    var imgData = e.target.result;
                     
                     var li = document.createElement("li");
                     li.className = "message user1";
+                    var img = new Image();
+                    img.src = imgData;
+                    img.classList.add('image-preview');
                     li.appendChild(img);
                     document.getElementById("messages").appendChild(li);
                     
                     // Emit the image as base64 string to the server
                     socket.emit('message', {
-                        'msg': '<img src="' + e.target.result + '" class="image-preview">',
+                        'msg': imgData,
                         'room': room,
-                        'username': username
+                        'username': username,
+                        'type': 'image'
                     });
                     scrollToBottom(); // Scroll after sending an image
                 }
