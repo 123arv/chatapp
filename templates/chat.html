@@ -56,8 +56,6 @@
             font-size: 14px;
             max-width: 80%;
             word-break: break-word;
-            display: flex;
-            align-items: center;
         }
 
         .message.user1 {
@@ -74,11 +72,11 @@
             border: 1px solid #f5c6cb;
         }
 
-        .message img {
-            max-width: 100px;
-            max-height: 100px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+        .message.user3 {
+            background-color: #d3c6e0;
+            text-align: right;
+            color: #5a2e6f;
+            border: 1px solid #d3b1e1;
         }
 
         .message-input {
@@ -114,29 +112,6 @@
             background-color: #0056a0;
         }
 
-        /* Camera and File Input Styles */
-        #cameraInput,
-        #fileInput {
-            display: none;
-        }
-
-        .camera-button,
-        .file-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 8px;
-        }
-
-        .camera-button:hover,
-        .file-button:hover {
-            background-color: #218838;
-        }
-
         /* Responsive Design for Small Screens */
         @media (max-width: 480px) {
             .chat-header {
@@ -158,12 +133,6 @@
                 font-size: 12px;
                 padding: 6px;
             }
-
-            .camera-button,
-            .file-button {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
         }
     </style>
 </head>
@@ -176,10 +145,6 @@
         <div class="message-input">
             <input id="myMessage" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
-            <button class="camera-button" onclick="openCamera()">📷</button>
-            <button class="file-button" onclick="document.getElementById('fileInput').click()">📁</button>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="sendImage(event)">
-            <input type="file" id="fileInput" accept="image/*" onchange="sendImage(event)">
         </div>
     </div>
 
@@ -191,25 +156,22 @@
 
         socket.emit('join', {'username': username, 'room': room});
 
-        socket.on('message', function(data){
+        socket.on('message', function(msg){
             var li = document.createElement("li");
             li.className = "message";
 
-            // Determine the sender and style the message accordingly
-            if (data.username === username) {
-                li.classList.add("user1"); // Messages from the current user
+            // Example logic for user color coding (you can replace this with your own logic)
+            if (msg.startsWith(username + ":")) {
+                li.classList.add("user1"); // User 1
+            } else if (msg.startsWith("User2:")) {
+                li.classList.add("user2"); // User 2
+            } else if (msg.startsWith("User3:")) {
+                li.classList.add("user3"); // User 3
             } else {
-                li.classList.add("user2"); // Messages from others
+                li.classList.add("bot"); // Default bot style
             }
 
-            if (data.msg.startsWith('<img src=')) {
-                var img = document.createElement('img');
-                img.src = data.msg;
-                li.appendChild(img);
-            } else {
-                li.appendChild(document.createTextNode(data.msg));
-            }
-
+            li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
             scrollToBottom(); // Automatically scroll to the bottom
         });
@@ -233,37 +195,6 @@
         function scrollToBottom() {
             var messages = document.getElementById("messages");
             messages.scrollTop = messages.scrollHeight;
-        }
-
-        function openCamera() {
-            document.getElementById('cameraInput').click();
-        }
-
-        function sendImage(event) {
-            var file = event.target.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var imgSrc = e.target.result;
-                    socket.emit('message', {
-                        'msg': imgSrc,
-                        'room': room,
-                        'username': username
-                    });
-
-                    var img = new Image();
-                    img.src = imgSrc;
-                    img.classList.add('image-preview');
-                    
-                    var li = document.createElement("li");
-                    li.className = "message user1";
-                    li.appendChild(img);
-                    document.getElementById("messages").appendChild(li);
-
-                    scrollToBottom(); // Scroll after sending an image
-                }
-                reader.readAsDataURL(file);
-            }
         }
 
         window.onbeforeunload = function() {
