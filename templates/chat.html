@@ -13,110 +13,88 @@
             background: linear-gradient(135deg, #f0f4f8, #e6e9ef); /* Light mixed color gradient */
             background-size: cover;
             height: 100vh;
-            overflow: hidden; /* Prevent scrolling on body */
+            overflow: hidden;
         }
 
         .chat-container {
             display: flex;
             flex-direction: column;
             height: 100vh; /* Full viewport height */
-            width: 90vw;  /* Reduced width */
-            max-width: 360px; /* Further reduced max width */
+            width: 100vw;  /* Full viewport width */
+            max-width: 500px; /* Maximum width for larger screens */
             margin: 0 auto; /* Centered on the screen */
             background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: relative; /* For positioning children absolutely */
+            overflow: hidden;
         }
 
         .chat-header {
             background-color: #0078d4;
             color: white;
-            padding: 8px; /* Reduced padding */
+            padding: 10px;
             text-align: center;
             border-radius: 8px 8px 0 0;
             box-sizing: border-box;
-            font-size: 14px; /* Reduced font size */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: 18px;
         }
 
         #messages {
             list-style: none;
             padding: 0;
             margin: 0;
-            overflow-y: auto; /* Allow scrolling */
+            overflow-y: auto;
             flex: 1;
             box-sizing: border-box;
-            padding: 8px; /* Reduced padding */
-            display: flex;
-            flex-direction: column; /* Messages should flow from top to bottom */
         }
 
         .message {
-            padding: 6px; /* Reduced padding */
-            margin-bottom: 6px; /* Reduced space between messages */
-            border-radius: 8px; /* Reduced border-radius */
+            padding: 10px;
+            margin: 5px;
+            border-radius: 12px;
             box-sizing: border-box;
-            font-size: 12px; /* Reduced font size */
-            max-width: 100%;
+            font-size: 14px;
+            max-width: 80%;
             word-break: break-word;
-            display: block;
-            clear: both;
         }
 
         .message.user1 {
             background-color: #d1e7dd;
+            text-align: right;
             color: #004d00;
             border: 1px solid #c0e0d7;
-            text-align: right;
-            margin-left: auto;
         }
 
         .message.user2 {
             background-color: #f8d7da;
+            text-align: left;
             color: #721c24;
             border: 1px solid #f5c6cb;
-            text-align: left;
         }
 
         .message.user3 {
             background-color: #d3c6e0;
+            text-align: right;
             color: #5a2e6f;
             border: 1px solid #d3b1e1;
-            text-align: right;
-            margin-left: auto;
-        }
-
-        .message.bot {
-            background-color: #e0e0e0;
-            color: #333;
-            border: 1px solid #d0d0d0;
-            text-align: left;
         }
 
         .message-input {
             display: flex;
-            padding: 6px; /* Reduced padding */
+            padding: 10px;
             background-color: #f5f5f5;
             border-radius: 0 0 8px 8px;
             box-sizing: border-box;
-            align-items: center;
-            position: absolute; /* Fixed position at bottom */
-            bottom: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
         }
 
         .message-input input {
             flex: 1;
-            padding: 6px; /* Reduced padding */
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            margin-right: 4px; /* Reduced margin-right */
+            margin-right: 8px;
             outline: none;
-            font-size: 12px; /* Reduced font size */
+            font-size: 14px;
             -webkit-text-size-adjust: 100%; /* Prevent zooming on iOS */
         }
 
@@ -124,10 +102,10 @@
             background-color: #0078d4;
             color: white;
             border: none;
-            padding: 6px 12px; /* Reduced padding */
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px; /* Reduced font size */
+            font-size: 14px;
         }
 
         .message-input button:hover {
@@ -137,24 +115,23 @@
         /* Responsive Design for Small Screens */
         @media (max-width: 480px) {
             .chat-header {
-                font-size: 12px; /* Further reduced font size */
-                padding: 6px; /* Further reduced padding */
+                font-size: 16px;
+                padding: 8px;
             }
 
             .message-input input {
-                font-size: 10px; /* Further reduced font size */
-                padding: 6px; /* Further reduced padding */
+                font-size: 12px;
+                padding: 6px;
             }
 
             .message-input button {
-                font-size: 10px; /* Further reduced font size */
-                padding: 4px 8px; /* Further reduced padding */
+                font-size: 12px;
+                padding: 6px 12px;
             }
 
             .message {
-                font-size: 10px; /* Further reduced font size */
-                padding: 4px; /* Further reduced padding */
-                margin-bottom: 4px; /* Further reduced space between messages */
+                font-size: 12px;
+                padding: 6px;
             }
         }
     </style>
@@ -166,7 +143,7 @@
         </header>
         <ul id="messages"></ul>
         <div class="message-input">
-            <input id="myMessage" autocomplete="off" placeholder="Type your message here">
+            <input id="myMessage" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
@@ -195,9 +172,7 @@
             }
 
             li.appendChild(document.createTextNode(msg));
-            var messages = document.getElementById("messages");
-            messages.appendChild(li);
-            messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom to show latest message
+            document.getElementById("messages").appendChild(li);
         });
 
         function sendMessage() {
@@ -205,6 +180,13 @@
             if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 input.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default action
+                sendMessage();
             }
         }
 
