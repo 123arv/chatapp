@@ -56,6 +56,8 @@
             font-size: 14px;
             max-width: 80%;
             word-break: break-word;
+            display: flex;
+            align-items: center;
         }
 
         .message.user1 {
@@ -72,11 +74,11 @@
             border: 1px solid #f5c6cb;
         }
 
-        .message.user3 {
-            background-color: #d3c6e0;
-            text-align: right;
-            color: #5a2e6f;
-            border: 1px solid #d3b1e1;
+        .message img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
 
         .message-input {
@@ -135,14 +137,6 @@
             background-color: #218838;
         }
 
-        .image-preview {
-            max-width: 100px;
-            max-height: 100px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
         /* Responsive Design for Small Screens */
         @media (max-width: 480px) {
             .chat-header {
@@ -197,22 +191,25 @@
 
         socket.emit('join', {'username': username, 'room': room});
 
-        socket.on('message', function(msg){
+        socket.on('message', function(data){
             var li = document.createElement("li");
             li.className = "message";
 
-            // Example logic for user color coding (you can replace this with your own logic)
-            if (msg.startsWith(username + ":")) {
-                li.classList.add("user1"); // User 1
-            } else if (msg.startsWith("User2:")) {
-                li.classList.add("user2"); // User 2
-            } else if (msg.startsWith("User3:")) {
-                li.classList.add("user3"); // User 3
+            // Determine the sender and style the message accordingly
+            if (data.username === username) {
+                li.classList.add("user1"); // Messages from the current user
             } else {
-                li.classList.add("bot"); // Default bot style
+                li.classList.add("user2"); // Messages from others
             }
 
-            li.appendChild(document.createTextNode(msg));
+            if (data.msg.startsWith('<img src=')) {
+                var img = document.createElement('img');
+                img.src = data.msg;
+                li.appendChild(img);
+            } else {
+                li.appendChild(document.createTextNode(data.msg));
+            }
+
             document.getElementById("messages").appendChild(li);
             scrollToBottom(); // Automatically scroll to the bottom
         });
@@ -247,21 +244,22 @@
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
+                    var imgSrc = e.target.result;
+                    socket.emit('message', {
+                        'msg': imgSrc,
+                        'room': room,
+                        'username': username
+                    });
+
                     var img = new Image();
-                    img.src = e.target.result;
+                    img.src = imgSrc;
                     img.classList.add('image-preview');
                     
                     var li = document.createElement("li");
                     li.className = "message user1";
                     li.appendChild(img);
                     document.getElementById("messages").appendChild(li);
-                    
-                    // Emit the image as base64 string to the server
-                    socket.emit('message', {
-                        'msg': '<img src="' + e.target.result + '" class="image-preview">',
-                        'room': room,
-                        'username': username
-                    });
+
                     scrollToBottom(); // Scroll after sending an image
                 }
                 reader.readAsDataURL(file);
