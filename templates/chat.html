@@ -173,6 +173,7 @@
 
             li.appendChild(document.createTextNode(msg));
             document.getElementById("messages").appendChild(li);
+            scrollToBottom(); // Automatically scroll to the bottom
         });
 
         function sendMessage() {
@@ -180,6 +181,7 @@
             if (input.value) {
                 socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
                 input.value = '';
+                scrollToBottom(); // Scroll after sending a message
             }
         }
 
@@ -188,6 +190,11 @@
                 event.preventDefault(); // Prevent the default action
                 sendMessage();
             }
+        }
+
+        function scrollToBottom() {
+            var messages = document.getElementById("messages");
+            messages.scrollTop = messages.scrollHeight;
         }
 
         window.onbeforeunload = function() {
