@@ -107,6 +107,17 @@
             display: none;
         }
 
+        .message-input label {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
         .message-input button {
             background-color: #0078d4;
             color: white;
@@ -153,7 +164,8 @@
         <ul id="messages"></ul>
         <div class="message-input">
             <input id="myMessage" type="text" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
-            <input id="imageInput" type="file" accept="image/*">
+            <input id="imageInput" type="file" accept="image/*" onchange="handleFileSelect()">
+            <label for="imageInput">📷</label>
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
@@ -170,14 +182,10 @@
             var li = document.createElement("li");
             li.className = "message";
 
-            if (data.msg.startsWith(username + ":")) {
+            if (data.username === username) {
                 li.classList.add("user1");
-            } else if (data.msg.startsWith("User2:")) {
-                li.classList.add("user2");
-            } else if (data.msg.startsWith("User3:")) {
-                li.classList.add("user3");
             } else {
-                li.classList.add("bot");
+                li.classList.add("user2"); // Change as needed for different users
             }
 
             if (data.msg.startsWith('data:image/')) { // Check if message is an image
@@ -187,7 +195,7 @@
             } else {
                 li.appendChild(document.createTextNode(data.msg));
             }
-            
+
             document.getElementById("messages").appendChild(li);
             scrollToBottom();
         });
@@ -216,6 +224,19 @@
             if (event.key === 'Enter') {
                 event.preventDefault();
                 sendMessage();
+            }
+        }
+
+        function handleFileSelect() {
+            var fileInput = document.getElementById("imageInput");
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+                reader.onloadend = function() {
+                    socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
+                    fileInput.value = ''; // Clear the file input
+                }
+                reader.readAsDataURL(file);
             }
         }
 
