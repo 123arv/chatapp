@@ -228,16 +228,7 @@
         }
 
         function handleFileSelect() {
-            var fileInput = document.getElementById("imageInput");
-            if (fileInput.files.length > 0) {
-                var file = fileInput.files[0];
-                var reader = new FileReader();
-                reader.onloadend = function() {
-                    socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
-                    fileInput.value = ''; // Clear the file input
-                }
-                reader.readAsDataURL(file);
-            }
+            sendMessage(); // Send the file as soon as it's selected
         }
 
         function scrollToBottom() {
