@@ -86,6 +86,7 @@
 
         .message-input {
             display: flex;
+            flex-direction: column;
             padding: 10px;
             background-color: #f5f5f5;
             border-radius: 0 0 8px 8px;
@@ -93,11 +94,10 @@
         }
 
         .message-input input[type="text"] {
-            flex: 1;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            margin-right: 8px;
+            margin-bottom: 8px;
             outline: none;
             font-size: 14px;
             -webkit-text-size-adjust: 100%; /* Prevent zooming on iOS */
@@ -115,7 +115,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            margin-left: 8px;
+            margin-bottom: 8px;
         }
 
         .message-input button {
@@ -130,6 +130,13 @@
 
         .message-input button:hover {
             background-color: #0056a0;
+        }
+
+        .image-preview {
+            display: none;
+            margin-bottom: 8px;
+            max-width: 100%;
+            border-radius: 8px;
         }
 
         /* Responsive Design for Small Screens */
@@ -164,9 +171,10 @@
         <ul id="messages"></ul>
         <div class="message-input">
             <input id="myMessage" type="text" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
-            <input id="imageInput" type="file" accept="image/*" onchange="handleFileSelect()">
+            <input id="imageInput" type="file" accept="image/*" onchange="previewImage()">
             <label for="imageInput">📷</label>
-            <button onclick="sendMessage()">Send</button>
+            <img id="imagePreview" class="image-preview" />
+            <button id="sendButton" onclick="sendMessage()" style="display: none;">Send</button>
         </div>
     </div>
 
@@ -203,6 +211,7 @@
         function sendMessage() {
             var input = document.getElementById("myMessage");
             var fileInput = document.getElementById("imageInput");
+            var imagePreview = document.getElementById("imagePreview");
 
             if (fileInput.files.length > 0) {
                 var file = fileInput.files[0];
@@ -210,6 +219,8 @@
                 reader.onloadend = function() {
                     socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
                     fileInput.value = ''; // Clear the file input
+                    imagePreview.style.display = 'none'; // Hide the preview
+                    document.getElementById("sendButton").style.display = 'none'; // Hide the send button
                 }
                 reader.readAsDataURL(file);
             } else if (input.value) {
@@ -227,8 +238,21 @@
             }
         }
 
-        function handleFileSelect() {
-            sendMessage(); // Send the file as soon as it's selected
+        function previewImage() {
+            var fileInput = document.getElementById("imageInput");
+            var imagePreview = document.getElementById("imagePreview");
+            var sendButton = document.getElementById("sendButton");
+
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+                reader.onloadend = function() {
+                    imagePreview.src = reader.result;
+                    imagePreview.style.display = 'block';
+                    sendButton.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
         function scrollToBottom() {
