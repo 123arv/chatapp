@@ -75,7 +75,7 @@
 
         .message img {
             max-width: 100%;
-            max-height: 400px; /* Limit the height for better display */
+            max-height: 150px; /* Limit the height */
             border-radius: 8px;
             object-fit: contain;
         }
@@ -142,7 +142,17 @@
             background-color: #0056a0;
         }
 
-        .image-preview, .file-preview {
+        .image-preview {
+            display: none;
+            margin-bottom: 8px;
+            max-width: 100%;
+            border-radius: 8px;
+            max-height: 150px; /* Set max height for small preview */
+            overflow: hidden;
+            object-fit: contain;
+        }
+
+        .file-preview {
             display: none;
             margin-bottom: 8px;
             max-width: 100%;
@@ -279,14 +289,16 @@
                     };
                 } else {
                     reader.onload = function(e) {
-                        preview.style.display = 'none';
-                        filePreview.style.display = 'block';
                         filePreview.innerHTML = '<a href="' + e.target.result + '" download="' + file.name + '">' + file.name + '</a>';
+                        filePreview.style.display = 'block';
+                        preview.style.display = 'none';
                         sendButton.style.display = 'block';
                     };
                 }
 
                 reader.readAsDataURL(file);
+            } else {
+                clearFilePreview();
             }
         }
 
