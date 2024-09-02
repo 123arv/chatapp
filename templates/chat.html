@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Welcome to Chat Room</title>
+    <title>Chat Room</title>
     <style>
         /* General Styles */
         body {
@@ -56,6 +56,7 @@
             font-size: 14px;
             max-width: 80%;
             word-break: break-word;
+            position: relative;
         }
 
         .message.user1 {
@@ -77,6 +78,19 @@
             max-height: 400px; /* Limit the height for better display */
             border-radius: 8px;
             object-fit: contain;
+        }
+
+        .message .file {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .message .file a {
+            color: #0078d4;
+            text-decoration: none;
         }
 
         .message-input {
@@ -128,13 +142,11 @@
             background-color: #0056a0;
         }
 
-        .image-preview {
+        .image-preview, .file-preview {
             display: none;
             margin-bottom: 8px;
             max-width: 100%;
             border-radius: 8px;
-            height: auto;
-            max-height: 150px;
         }
 
         /* Responsive Design for Small Screens */
@@ -169,10 +181,11 @@
         <ul id="messages"></ul>
         <div class="message-input">
             <input id="myMessage" type="text" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
-            <input id="imageInput" type="file" accept="image/*" onchange="previewImage()">
-            <label for="imageInput">📷</label>
+            <input id="fileInput" type="file" accept="image/*, .pdf, .doc, .docx, .xls, .xlsx" onchange="previewFile()">
+            <label for="fileInput">📁</label>
             <img id="imagePreview" class="image-preview" />
-            <button id="sendImageButton" onclick="sendImage()" style="display: none;">Send Image</button>
+            <div id="filePreview" class="file-preview"></div>
+            <button id="sendFileButton" onclick="sendFile()" style="display: none;">Send File</button>
             <button id="sendMessageButton" onclick="sendMessage()">Send Message</button>
         </div>
     </div>
@@ -199,6 +212,16 @@
                 var img = document.createElement('img');
                 img.src = data.msg;
                 li.appendChild(img);
+            } else if (data.type === 'file') {
+                var fileContainer = document.createElement('div');
+                fileContainer.className = 'file';
+                var fileLink = document.createElement('a');
+                fileLink.href = data.msg;
+                fileLink.download = data.filename;
+                fileLink.textContent = data.filename;
+                fileLink.target = '_blank';
+                fileContainer.appendChild(fileLink);
+                li.appendChild(fileContainer);
             } else {
                 li.appendChild(document.createTextNode(data.msg));
             }
@@ -218,50 +241,64 @@
             scrollToBottom();
         }
 
-        function sendImage() {
-            var fileInput = document.getElementById("imageInput");
-            var imageFile = fileInput.files[0];
+        function sendFile() {
+            var fileInput = document.getElementById("fileInput");
+            var file = fileInput.files[0];
             var reader = new FileReader();
+            var fileType = file.type.split('/')[0];
 
             reader.onload = function(e) {
-                socket.emit('message', {'msg': e.target.result, 'room': room, 'username': username, 'type': 'image'});
-                clearImagePreview();
+                if (fileType === 'image') {
+                    socket.emit('message', {'msg': e.target.result, 'room': room, 'username': username, 'type': 'image'});
+                } else {
+                    socket.emit('message', {'msg': e.target.result, 'room': room, 'username': username, 'type': 'file', 'filename': file.name});
+                }
+                clearFilePreview();
             };
 
-            reader.readAsDataURL(imageFile);
+            reader.readAsDataURL(file);
         }
 
-        function previewImage() {
-            var fileInput = document.getElementById("imageInput");
+        function previewFile() {
+            var fileInput = document.getElementById("fileInput");
             var preview = document.getElementById("imagePreview");
-            var sendButton = document.getElementById("sendImageButton");
+            var filePreview = document.getElementById("filePreview");
+            var sendButton = document.getElementById("sendFileButton");
 
             if (fileInput.files && fileInput.files[0]) {
+                var file = fileInput.files[0];
                 var reader = new FileReader();
+                var fileType = file.type.split('/')[0];
 
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                    sendButton.style.display = "inline-block";
-                };
+                if (fileType === 'image') {
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        filePreview.style.display = 'none';
+                        sendButton.style.display = 'block';
+                    };
+                } else {
+                    reader.onload = function(e) {
+                        preview.style.display = 'none';
+                        filePreview.style.display = 'block';
+                        filePreview.innerHTML = '<a href="' + e.target.result + '" download="' + file.name + '">' + file.name + '</a>';
+                        sendButton.style.display = 'block';
+                    };
+                }
 
-                reader.readAsDataURL(fileInput.files[0]);
+                reader.readAsDataURL(file);
             }
         }
 
-        function clearImagePreview() {
-            var preview = document.getElementById("imagePreview");
-            var sendButton = document.getElementById("sendImageButton");
-            var fileInput = document.getElementById("imageInput");
-
-            preview.style.display = "none";
-            sendButton.style.display = "none";
-            fileInput.value = "";
-            preview.src = "";
+        function clearFilePreview() {
+            document.getElementById("imagePreview").style.display = 'none';
+            document.getElementById("filePreview").style.display = 'none';
+            document.getElementById("sendFileButton").style.display = 'none';
+            document.getElementById("fileInput").value = '';
         }
 
         function handleKeyPress(event) {
-            if (event.key === "Enter") {
+            if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 sendMessage();
             }
