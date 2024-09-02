@@ -168,7 +168,7 @@
         <div class="message-input">
             <input id="myMessage" type="text" autocomplete="off" placeholder="Type your message here" onkeydown="handleKeyPress(event)">
             <input id="imageInput" type="file" accept="image/*" onchange="previewImage()">
-            <label for="imageInput">📷 Upload or Take a Photo</label>
+            <label for="imageInput">📷 Upload/Take Photo</label>
             <img id="imagePreview" class="image-preview" />
             <button id="sendImageButton" onclick="sendImage()" style="display: none;">Send Image</button>
             <button id="sendMessageButton" onclick="sendMessage()">Send Message</button>
@@ -224,10 +224,14 @@
                 var file = fileInput.files[0];
                 var reader = new FileReader();
                 reader.onloadend = function() {
-                    socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
-                    fileInput.value = '';
-                    imagePreview.style.display = 'none';
-                    document.getElementById("sendImageButton").style.display = 'none';
+                    if (reader.result.startsWith('data:image/')) {
+                        socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
+                        fileInput.value = '';
+                        imagePreview.style.display = 'none';
+                        document.getElementById("sendImageButton").style.display = 'none';
+                    } else {
+                        alert('Selected file is not a valid image format');
+                    }
                 }
                 reader.readAsDataURL(file);
             }
@@ -249,9 +253,15 @@
                 var file = fileInput.files[0];
                 var reader = new FileReader();
                 reader.onloadend = function() {
-                    imagePreview.src = reader.result;
-                    imagePreview.style.display = 'block';
-                    sendImageButton.style.display = 'block';
+                    if (reader.result.startsWith('data:image/')) {
+                        imagePreview.src = reader.result;
+                        imagePreview.style.display = 'block';
+                        sendImageButton.style.display = 'block';
+                    } else {
+                        alert('Selected file is not a valid image format');
+                        imagePreview.style.display = 'none';
+                        sendImageButton.style.display = 'none';
+                    }
                 }
                 reader.readAsDataURL(file);
             } else {
