@@ -126,6 +126,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            margin-bottom: 8px;
         }
 
         .message-input button:hover {
@@ -137,6 +138,8 @@
             margin-bottom: 8px;
             max-width: 100%;
             border-radius: 8px;
+            height: auto;
+            max-height: 150px; /* Smaller image preview */
         }
 
         /* Responsive Design for Small Screens */
@@ -174,7 +177,8 @@
             <input id="imageInput" type="file" accept="image/*" onchange="previewImage()">
             <label for="imageInput">📷</label>
             <img id="imagePreview" class="image-preview" />
-            <button id="sendButton" onclick="sendMessage()" style="display: none;">Send</button>
+            <button id="sendImageButton" onclick="sendImage()" style="display: none;">Send Image</button>
+            <button id="sendMessageButton" onclick="sendMessage()">Send Message</button>
         </div>
     </div>
 
@@ -210,6 +214,16 @@
 
         function sendMessage() {
             var input = document.getElementById("myMessage");
+
+            if (input.value) {
+                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
+                input.value = '';
+            }
+
+            scrollToBottom();
+        }
+
+        function sendImage() {
             var fileInput = document.getElementById("imageInput");
             var imagePreview = document.getElementById("imagePreview");
 
@@ -220,15 +234,10 @@
                     socket.emit('message', {'msg': reader.result, 'room': room, 'username': username});
                     fileInput.value = ''; // Clear the file input
                     imagePreview.style.display = 'none'; // Hide the preview
-                    document.getElementById("sendButton").style.display = 'none'; // Hide the send button
+                    document.getElementById("sendImageButton").style.display = 'none'; // Hide the send button
                 }
                 reader.readAsDataURL(file);
-            } else if (input.value) {
-                socket.emit('message', {'msg': input.value, 'room': room, 'username': username});
-                input.value = '';
             }
-
-            scrollToBottom();
         }
 
         function handleKeyPress(event) {
@@ -241,7 +250,7 @@
         function previewImage() {
             var fileInput = document.getElementById("imageInput");
             var imagePreview = document.getElementById("imagePreview");
-            var sendButton = document.getElementById("sendButton");
+            var sendImageButton = document.getElementById("sendImageButton");
 
             if (fileInput.files.length > 0) {
                 var file = fileInput.files[0];
@@ -249,9 +258,12 @@
                 reader.onloadend = function() {
                     imagePreview.src = reader.result;
                     imagePreview.style.display = 'block';
-                    sendButton.style.display = 'block';
+                    sendImageButton.style.display = 'block';
                 }
                 reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+                sendImageButton.style.display = 'none';
             }
         }
 
@@ -266,3 +278,5 @@
     </script>
 </body>
 </html>
+
+            background-color
