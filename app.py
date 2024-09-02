@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send
-import os
+import gevent
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -35,7 +35,10 @@ def handle_message(data):
     room = data['room']
     msg = data['msg']
     username = data['username']
-    send({'msg': msg, 'username': username, 'type': data.get('type', 'text'), 'filename': data.get('filename', '')}, to=room)
+    msg_type = data['type']
+    filename = data.get('filename', '')
+
+    send({'msg': msg, 'username': username, 'type': msg_type, 'filename': filename}, to=room)
 
 if __name__ == '__main__':
     import os
